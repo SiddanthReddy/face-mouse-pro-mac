@@ -25,7 +25,9 @@ class Settings:
 
 class SettingsStore:
     def __init__(self, path: Path | None = None) -> None:
-        self.path = path or Path.home() / "Library" / "Application Support" / "Face Mouse Pro" / "settings.json"
+        self.path = path or (
+            Path.home() / "Library" / "Application Support" / "Face Mouse Pro" / "settings.json"
+        )
 
     def load(self) -> Settings:
         if not self.path.exists():

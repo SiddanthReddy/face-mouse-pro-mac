@@ -19,7 +19,9 @@ def request_camera_access(callback) -> None:
         return
     import AVFoundation  # type: ignore[import-not-found]
 
-    AVFoundation.AVCaptureDevice.requestAccessForMediaType_completionHandler_(AVFoundation.AVMediaTypeVideo, callback)
+    AVFoundation.AVCaptureDevice.requestAccessForMediaType_completionHandler_(
+        AVFoundation.AVMediaTypeVideo, callback
+    )
 
 
 def accessibility_trusted(prompt: bool = False) -> bool:

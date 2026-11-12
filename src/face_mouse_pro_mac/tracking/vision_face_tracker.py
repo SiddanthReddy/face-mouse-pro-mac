@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from __future__ import annotations
-
 import sys
 
 from .landmark_adapter import six_contour_points, vision_points_to_image

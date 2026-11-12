@@ -4,7 +4,7 @@ from PyInstaller.utils.hooks import collect_all
 
 ROOT = Path(SPECPATH).parent.parent
 datas, binaries, hiddenimports = [], [], []
-for framework in ("AVFoundation", "Vision", "Quartz", "CoreMedia", "CoreVideo", "CoreImage", "dispatch"):
+for framework in ("AVFoundation", "Vision", "Quartz", "CoreMedia", "dispatch"):
     framework_datas, framework_binaries, framework_hidden = collect_all(framework)
     datas += framework_datas
     binaries += framework_binaries

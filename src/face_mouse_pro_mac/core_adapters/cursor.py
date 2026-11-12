@@ -7,7 +7,11 @@ from face_mouse_core.models import NormalizedPoint, TimestampedPoint, Vector2D
 
 
 class CursorAdapter:
-    def __init__(self, mapping: CursorMappingConfig | None = None, smoothing: SmoothingConfig | None = None) -> None:
+    def __init__(
+        self,
+        mapping: CursorMappingConfig | None = None,
+        smoothing: SmoothingConfig | None = None,
+    ) -> None:
         self.mapper = CursorMapper(mapping or CursorMappingConfig())
         self.filter = OneEuroFilter2D(smoothing or SmoothingConfig())
 

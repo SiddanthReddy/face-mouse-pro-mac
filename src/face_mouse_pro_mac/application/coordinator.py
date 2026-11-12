@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import logging
 
+from face_mouse_core.models import NormalizedPoint
+
 from ..camera.protocol import Camera
 from ..control.quartz_mouse_controller import MouseController
 from ..core_adapters.calibration import CalibrationAdapter
 from ..core_adapters.cursor import CursorAdapter
 from ..core_adapters.gestures import GestureAdapter
 from ..tracking.protocol import FaceTracker
-from face_mouse_core.models import NormalizedPoint
 
 log = logging.getLogger(__name__)
 
@@ -81,7 +82,8 @@ class Coordinator:
                     self.calibration_sampling = False
                     self.status_callback("Neutral calibration complete")
                 else:
-                    self.status_callback(f"Calibrating neutral — {self.calibration.accumulator.sample_count}/20")
+                    sample_count = self.calibration.accumulator.sample_count
+                    self.status_callback(f"Calibrating neutral — {sample_count}/20")
             if self.control_active:
                 neutral_offset = self.calibration.offset(NormalizedPoint(*observation.nose_point))
                 point = self.cursor.move(neutral_offset, timestamp)

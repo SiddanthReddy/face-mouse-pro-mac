@@ -12,7 +12,9 @@ class Tracker:
 
 
 class RecordingMouse:
-    def __init__(self): self.positions = []; self.paused = True
+    def __init__(self):
+        self.positions = []
+        self.paused = True
     def move(self, x, y): self.positions.append((x, y))
     def click(self, button="left", count=1): pass
     def pause(self): self.paused = True

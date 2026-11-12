@@ -4,9 +4,18 @@ from __future__ import annotations
 
 import threading
 import time
-from typing import Callable
+from collections.abc import Callable
+from typing import Protocol, cast
 
 from .protocol import CameraDevice
+
+
+class _NSObjectInstance(Protocol):
+    def init(self) -> _NSObjectInstance: ...
+
+
+class _NSObjectClass(Protocol):
+    def alloc(self) -> _NSObjectInstance: ...
 
 
 class AVFoundationCamera:
@@ -15,15 +24,18 @@ class AVFoundationCamera:
             raise RuntimeError("AVFoundation camera capture is available only on macOS")
         import AVFoundation  # type: ignore[import-not-found]
         import CoreMedia  # type: ignore[import-not-found]
-        import Foundation  # type: ignore[import-not-found]
         import dispatch  # type: ignore[import-not-found]
+        import Foundation  # type: ignore[import-not-found]
 
-        self.AVFoundation, self.CoreMedia, self.Foundation, self.dispatch = AVFoundation, CoreMedia, Foundation, dispatch
+        self.AVFoundation = AVFoundation
+        self.CoreMedia = CoreMedia
+        self.Foundation = Foundation
+        self.dispatch = dispatch
         self.session = None
         self.output = None
-        self.delegate = None
+        self.delegate: _NSObjectInstance | None = None
         self.error_callback = lambda _message: None
-        self._notification_tokens = []
+        self._notification_tokens: list[object] = []
         self._lock = threading.RLock()
 
     def devices(self) -> list[CameraDevice]:
@@ -50,14 +62,24 @@ class AVFoundationCamera:
                 raise RuntimeError(f"Unable to open camera: {error}")
             output = av.AVCaptureVideoDataOutput.alloc().init()
             output.setAlwaysDiscardsLateVideoFrames_(True)
-            class Delegate(self.Foundation.NSObject):
-                def captureOutput_didOutputSampleBuffer_fromConnection_(self, _out, sample, _connection):
-                    callback(sample, time.monotonic())
+            def capture_output(_delegate, _out, sample, _connection):
+                callback(sample, time.monotonic())
 
-                def captureOutput_didDropSampleBuffer_fromConnection_(self, _out, _sample, _connection):
-                    return
+            def capture_dropped_sample(_delegate, _out, _sample, _connection):
+                return
 
-            self.delegate = Delegate.alloc().init()
+            delegate_class = cast(
+                _NSObjectClass,
+                type(
+                    "Delegate",
+                    (self.Foundation.NSObject,),
+                    {
+                        "captureOutput_didOutputSampleBuffer_fromConnection_": capture_output,
+                        "captureOutput_didDropSampleBuffer_fromConnection_": capture_dropped_sample,
+                    },
+                ),
+            )
+            self.delegate = delegate_class.alloc().init()
             self._queue = self.dispatch.dispatch_queue_create("com.siddanthreddy.facemousepro.capture", None)
             output.setSampleBufferDelegate_queue_(self.delegate, self._queue)
             if not session.canAddInput_(input_device) or not session.canAddOutput_(output):

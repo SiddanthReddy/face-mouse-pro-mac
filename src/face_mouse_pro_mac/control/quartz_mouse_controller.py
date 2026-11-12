@@ -70,12 +70,18 @@ class QuartzMouseController:
 
     def scroll(self, delta: int) -> None:
         if self.enabled and not self.paused:
-            self.q.CGEventPost(self.q.kCGHIDEventTap, self.q.CGEventCreateScrollWheelEvent(None, self.q.kCGScrollEventUnitLine, 1, delta))
+            event = self.q.CGEventCreateScrollWheelEvent(
+                None, self.q.kCGScrollEventUnitLine, 1, delta
+            )
+            self.q.CGEventPost(self.q.kCGHIDEventTap, event)
 
     def begin_drag(self) -> None:
         if self.enabled and not self.paused:
             q = self.q
-            event = q.CGEventCreateMouseEvent(None, q.kCGEventLeftMouseDown, q.CGEventGetLocation(q.CGEventCreate(None)), q.kCGMouseButtonLeft)
+            location = q.CGEventGetLocation(q.CGEventCreate(None))
+            event = q.CGEventCreateMouseEvent(
+                None, q.kCGEventLeftMouseDown, location, q.kCGMouseButtonLeft
+            )
             q.CGEventPost(q.kCGHIDEventTap, event)
             self._held.add(q.kCGMouseButtonLeft)
 
@@ -86,7 +92,9 @@ class QuartzMouseController:
         q = self.q
         for button in tuple(self._held):
             event_type = q.kCGEventLeftMouseUp if button == q.kCGMouseButtonLeft else q.kCGEventRightMouseUp
-            q.CGEventPost(q.kCGHIDEventTap, q.CGEventCreateMouseEvent(None, event_type, q.CGEventGetLocation(q.CGEventCreate(None)), button))
+            location = q.CGEventGetLocation(q.CGEventCreate(None))
+            event = q.CGEventCreateMouseEvent(None, event_type, location, button)
+            q.CGEventPost(q.kCGHIDEventTap, event)
             self._held.discard(button)
 
     def emergency_stop(self) -> None:

@@ -1,8 +1,8 @@
 from face_mouse_core.models import NormalizedPoint
 
 from face_mouse_pro_mac.core_adapters.calibration import CalibrationAdapter
-from face_mouse_pro_mac.core_adapters.gestures import GestureAdapter
 from face_mouse_pro_mac.core_adapters.cursor import CursorAdapter
+from face_mouse_pro_mac.core_adapters.gestures import GestureAdapter
 
 
 def test_calibration_neutral_and_deadzone():

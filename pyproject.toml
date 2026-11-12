@@ -12,7 +12,7 @@ license = {text = "MIT"}
 dependencies = ["face-mouse-pro-core @ git+https://github.com/SiddanthReddy/face-mouse-pro-core.git@7ae514e29578f09a819ae4f5bb84218049e338e5"]
 
 [project.optional-dependencies]
-macos = ["pyobjc-framework-Cocoa>=10.0", "pyobjc-framework-AVFoundation>=10.0", "pyobjc-framework-Vision>=10.0", "pyobjc-framework-Quartz>=10.0", "pyobjc-framework-CoreMedia>=10.0", "pyobjc-framework-CoreVideo>=10.0", "pyobjc-framework-CoreImage>=10.0", "pyobjc-framework-libdispatch>=10.0"]
+macos = ["pyobjc-framework-Cocoa>=10.0", "pyobjc-framework-AVFoundation>=10.0", "pyobjc-framework-Vision>=10.0", "pyobjc-framework-Quartz>=10.0", "pyobjc-framework-CoreMedia>=10.0", "pyobjc-framework-libdispatch>=10.0"]
 dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.9", "mypy>=1.13", "pyinstaller>=6.11"]
 
 [project.scripts]

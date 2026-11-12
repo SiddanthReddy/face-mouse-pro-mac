@@ -1,5 +1,6 @@
-from face_mouse_pro_mac.application.coordinator import Coordinator
 from face_mouse_core.models import NormalizedPoint
+
+from face_mouse_pro_mac.application.coordinator import Coordinator
 
 
 class FakeCamera:
@@ -13,7 +14,9 @@ class FakeTracker:
 
 
 class FakeMouse:
-    def __init__(self): self.paused = True; self.stopped = False
+    def __init__(self):
+        self.paused = True
+        self.stopped = False
     def move(self, x, y): raise AssertionError("face loss should suppress movement")
     def click(self, button="left", count=1): raise AssertionError("face loss should suppress clicks")
     def pause(self): self.paused = True

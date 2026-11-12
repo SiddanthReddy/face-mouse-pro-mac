@@ -10,6 +10,22 @@ This is an explicit approximation, not MediaPipe mesh equivalence; thresholds re
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import Protocol
+
+
+class _Point(Protocol):
+    x: float
+    y: float
+
+
+class _Size(Protocol):
+    width: float
+    height: float
+
+
+class _Rectangle(Protocol):
+    origin: _Point
+    size: _Size
 
 
 def six_contour_points(points: Sequence[tuple[float, float]]) -> tuple[tuple[float, float], ...]:
@@ -23,7 +39,7 @@ def six_contour_points(points: Sequence[tuple[float, float]]) -> tuple[tuple[flo
     return result
 
 
-def vision_points_to_image(points: Sequence[object], bbox: object) -> tuple[tuple[float, float], ...]:
+def vision_points_to_image(points: Sequence[_Point], bbox: _Rectangle) -> tuple[tuple[float, float], ...]:
     x0, y0, width, height = bbox.origin.x, bbox.origin.y, bbox.size.width, bbox.size.height
     converted = []
     for point in points:

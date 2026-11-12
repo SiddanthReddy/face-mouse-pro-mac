@@ -11,7 +11,9 @@ class GestureAdapter:
     """Keeps Vision measurements behind an explicit six-point core boundary."""
 
     def __init__(self, config: GestureConfig | None = None) -> None:
-        self.detector = GestureDetector(config or GestureConfig(blink_ear_threshold=0.16, mouth_mar_threshold=0.30))
+        self.detector = GestureDetector(
+            config or GestureConfig(blink_ear_threshold=0.16, mouth_mar_threshold=0.30)
+        )
 
     def update(self, face: FaceObservation | None, timestamp: float) -> GestureType:
         if face is None:

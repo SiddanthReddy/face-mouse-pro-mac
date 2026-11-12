@@ -6,8 +6,15 @@ import threading
 
 import objc  # type: ignore[import-not-found]
 from AppKit import (  # type: ignore[import-not-found]
-    NSBackingStoreBuffered, NSButton, NSComboBox, NSMakeRect, NSSlider, NSWindow, NSWindowStyleMaskClosable,
-    NSWindowStyleMaskMiniaturizable, NSWindowStyleMaskTitled,
+    NSBackingStoreBuffered,
+    NSButton,
+    NSComboBox,
+    NSMakeRect,
+    NSSlider,
+    NSWindow,
+    NSWindowStyleMaskClosable,
+    NSWindowStyleMaskMiniaturizable,
+    NSWindowStyleMaskTitled,
 )
 from Foundation import NSObject  # type: ignore[import-not-found]
 
@@ -18,17 +25,25 @@ class MainWindowController(NSObject):
         if self is None:
             return None
         style = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable
-        self.window = NSWindow.alloc().initWithContentRect_styleMask_backing_defer_(NSMakeRect(0, 0, 660, 600), style, NSBackingStoreBuffered, False)
+        self.window = NSWindow.alloc().initWithContentRect_styleMask_backing_defer_(
+            NSMakeRect(0, 0, 660, 600), style, NSBackingStoreBuffered, False
+        )
         self.window.setTitle_("Face Mouse Pro")
         self.window.center()
-        self.status = self._label("Welcome. Camera and pointer control start only when you choose.", 24, 548, 600, 32)
+        self.status = self._label(
+            "Welcome. Camera and pointer control start only when you choose.", 24, 548, 600, 32
+        )
         self.camera_button = self._button("Start Camera", "startCamera:", 24, 488, 190)
         self.refresh_button = self._button("Refresh Cameras", "refreshCameras:", 430, 488, 190)
         self.calibrate_button = self._button("Calibrate Neutral", "calibrate:", 230, 488, 190)
         self.activate_button = self._button("Enable Pointer Control", "activate:", 24, 432, 250)
         self.pause_button = self._button("Pause", "pause:", 290, 432, 120)
         self.stop_button = self._button("Emergency Stop", "stop:", 430, 432, 190)
-        self.permission = self._label("Camera permission is requested when Start Camera is selected. Accessibility permission is required to activate pointer control.", 24, 360, 600, 52)
+        self.permission = self._label(
+            "Camera permission is requested when Start Camera is selected. "
+            "Accessibility permission is required to activate pointer control.",
+            24, 360, 600, 52,
+        )
         self.camera_picker = NSComboBox.alloc().initWithFrame_(NSMakeRect(24, 305, 360, 30))
         self.camera_picker.setPlaceholderString_("Choose a camera")
         self.view.addSubview_(self.camera_picker)
@@ -112,7 +127,9 @@ class MainWindowController(NSObject):
                 )
                 return
             if state != "authorized":
-                self._set_status(f"Camera access is {state}. Enable it in System Settings → Privacy & Security → Camera.")
+                self._set_status(
+                    f"Camera access is {state}. Enable it in System Settings → Privacy & Security → Camera."
+                )
                 return
             self._start_services()
         except Exception as exc:
@@ -122,7 +139,9 @@ class MainWindowController(NSObject):
         if allowed:
             self._start_services()
         else:
-            self._set_status("Camera permission denied. Enable it in System Settings → Privacy & Security → Camera.")
+            self._set_status(
+                "Camera permission denied. Enable it in System Settings → Privacy & Security → Camera."
+            )
 
     def refreshCameras_(self, _sender):
         try:
@@ -132,7 +151,10 @@ class MainWindowController(NSObject):
             for device in self._camera_devices:
                 self.camera_picker.addItemWithObjectValue_(device.name)
             saved_index = next(
-                (i for i, device in enumerate(self._camera_devices) if device.identifier == self.settings.camera_id),
+                (
+                    i for i, device in enumerate(self._camera_devices)
+                    if device.identifier == self.settings.camera_id
+                ),
                 0 if self._camera_devices else -1,
             )
             if saved_index >= 0:
@@ -143,20 +165,23 @@ class MainWindowController(NSObject):
 
     def _start_services(self):
         try:
+            from ..application.coordinator import Coordinator
             from ..camera.avfoundation_camera import AVFoundationCamera
             from ..control.quartz_mouse_controller import QuartzMouseController
             from ..tracking.vision_face_tracker import VisionFaceTracker
-            from ..application.coordinator import Coordinator
             camera = AVFoundationCamera()
             self.coordinator = Coordinator(camera, VisionFaceTracker(), QuartzMouseController())
             self.coordinator.status_callback = self._set_status
             self.coordinator.preview_callback = self._update_preview
             selected = self.camera_picker.indexOfSelectedItem()
-            camera_id = self._camera_devices[selected].identifier if 0 <= selected < len(self._camera_devices) else self.settings.camera_id
+            camera_id = (
+                self._camera_devices[selected].identifier
+                if 0 <= selected < len(self._camera_devices)
+                else self.settings.camera_id
+            )
             self.settings.camera_id = camera_id
             self.settings_store.save(self.settings)
-            from face_mouse_core.config import CursorMappingConfig
-            from face_mouse_core.config import GestureConfig
+            from face_mouse_core.config import CursorMappingConfig, GestureConfig
             self.coordinator.cursor.mapper.config = CursorMappingConfig(
                 sensitivity_x=2.2 * self.settings.sensitivity,
                 sensitivity_y=2.0 * self.settings.sensitivity,
@@ -206,7 +231,10 @@ class MainWindowController(NSObject):
         except PermissionError:
             from ..control.permissions import accessibility_trusted
             accessibility_trusted(prompt=True)
-            self._set_status("Grant Accessibility in System Settings → Privacy & Security → Accessibility, then activate again.")
+            self._set_status(
+                "Grant Accessibility in System Settings → Privacy & Security → Accessibility, "
+                "then activate again."
+            )
         except RuntimeError as exc:
             self._set_status(str(exc))
 
@@ -230,8 +258,8 @@ class MainWindowController(NSObject):
     def renderPreview_(self, sample):
         try:
             import CoreMedia
-            from CoreImage import CIImage
-            from AppKit import NSImage, NSCIImageRep
+            from AppKit import NSCIImageRep, NSImage
+            from Quartz import CIImage
             pixel_buffer = CoreMedia.CMSampleBufferGetImageBuffer(sample)
             ci_image = CIImage.imageWithCVPixelBuffer_(pixel_buffer)
             rep = NSCIImageRep.imageRepWithCIImage_(ci_image)
