@@ -2,7 +2,13 @@
 
 Hands-free pointer control experiment built with AppKit, AVFoundation, Apple Vision, Quartz, and the shared [face-mouse-pro-core](https://github.com/SiddanthReddy/face-mouse-pro-core). Camera images are processed locally and are not recorded.
 
-> Early implementation: face tracking and an opt-in pointer pipeline are present. The sparse Vision contour adapter is an approximation and needs real-user calibration. Review the limitations before enabling pointer control.
+> Experimental implementation: camera capture and an opt-in pointer pipeline are implemented, but end-to-end face tracking is not yet validated. The sparse Vision contour adapter is an approximation and needs real-user calibration. Do not enable pointer control until the tracking conversion issue is resolved and manually verified.
+
+## Current validation status
+
+The macOS CI workflow passes its automated dependency, quality, and test checks on the current implementation branch. This does not establish successful live face tracking or reliable pointer control on physical hardware. In the latest local camera test, AVFoundation capture started, but Vision landmark conversion raised an out-of-range coordinate error and face tracking did not proceed. The coordinate-conversion correction and a successful end-to-end camera test are still required before enabling pointer control for normal use. Keep pointer control disabled while validating this issue.
+
+There is no published macOS release. The app is not Developer ID signed or notarized.
 
 ## Features
 
